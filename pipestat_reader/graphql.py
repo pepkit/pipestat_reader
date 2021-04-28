@@ -1,10 +1,13 @@
+import os
 from typing import Dict, List, Optional, Tuple, Union
 
 import graphene
 import pipestat
 from graphene import relay
 from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
+from graphene_sqlalchemy.registry import get_global_registry
 from graphene_sqlalchemy_filter import FilterableConnectionField, FilterSet
+from sqlalchemy.inspection import inspect
 
 from ._version import __version__
 from .const import FILTERS_BY_CLASS, PACKAGE_NAME
@@ -20,6 +23,8 @@ class PipestatReader(dict):
             self[namespace]["table_model"] = pipestat_manager._get_orm(
                 table_name=self[namespace]["table_name"]
             )
+        # the repeated loop is needed so we can get access to all the mappers
+        for namespace, pipestat_manager in self.pipestat_managers_dict.items():
             meta = type(
                 "Meta",
                 (),
@@ -41,10 +46,23 @@ class PipestatReader(dict):
                     },
                 },
             )
+
+            attrs = {"Meta": meta}
+            relationships = inspect(self[namespace]["table_model"]).relationships
+            print(f"relationships: {relationships.items()}")
+            if len(relationships.keys()):
+                for relationship in relationships.keys():
+                    print(f"adding relationship: {relationship}")
+                    attrs.update(
+                        {
+                            relationship: f"{PACKAGE_NAME}.{os.path.basename(__file__)}.{self[namespace]['table_name'].capitalize()}SQLAlchemyObjectType"
+                        }
+                    )
+
             self[namespace]["SQLAlchemyObjectType"] = type(
                 f"{self[namespace]['table_name'].capitalize()}SQLAlchemyObjectType",
                 (SQLAlchemyObjectType,),
-                {"Meta": meta},
+                attrs,
             )
             self[namespace]["filter"] = type(
                 f"{self[namespace]['table_name'].capitalize()}Filter",
