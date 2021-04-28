@@ -7,7 +7,7 @@ from graphene_sqlalchemy import SQLAlchemyConnectionField, SQLAlchemyObjectType
 from graphene_sqlalchemy_filter import FilterableConnectionField, FilterSet
 
 from ._version import __version__
-from .const import PACKAGE_NAME
+from .const import FILTERS_BY_CLASS, PACKAGE_NAME
 
 
 class PipestatReader(dict):
@@ -33,7 +33,13 @@ class PipestatReader(dict):
             meta_filter = type(
                 "Meta",
                 (),
-                {"model": self[namespace]["table_model"], "fields": {"name": [...]}},
+                {
+                    "model": self[namespace]["table_model"],
+                    "fields": {
+                        c.name: FILTERS_BY_CLASS[c.type.__class__.__name__]
+                        for c in self[namespace]["table_model"].__table__.columns
+                    },
+                },
             )
             self[namespace]["SQLAlchemyObjectType"] = type(
                 f"{self[namespace]['table_name'].capitalize()}SQLAlchemyObjectType",
@@ -47,7 +53,7 @@ class PipestatReader(dict):
             )
 
     @property
-    def query(self):
+    def query(self) -> type:
         attrs = {"node": relay.Node.Field()}
         for namespace in self.pipestat_managers_dict.keys():
             attrs.update(
@@ -64,7 +70,7 @@ class PipestatReader(dict):
             attrs,
         )
 
-    def generate_graphql_schema(self):
+    def generate_graphql_schema(self) -> graphene.Schema:
         return graphene.Schema(query=self.query)
 
 
