@@ -15,6 +15,7 @@ from .const import FILTERS_BY_CLASS, PACKAGE_NAME
 
 class PipestatReader(dict):
     def __init__(self, pipestat_managers: List[pipestat.PipestatManager]):
+        super(PipestatReader, self).__init__()
         self.pipestat_managers_dict = {psm.namespace: psm for psm in pipestat_managers}
         for namespace, pipestat_manager in self.pipestat_managers_dict.items():
             self.setdefault(namespace, {})
@@ -31,7 +32,7 @@ class PipestatReader(dict):
                 {
                     "model": self[namespace]["table_model"],
                     "interfaces": (relay.Node,),
-                    "description": f"'{self[namespace]['table_name']}' model generated with "
+                    "description": f"*{self[namespace]['table_name']}* table model generated with "
                     f"`{PACKAGE_NAME} v{__version__}`",
                 },
             )
@@ -49,18 +50,17 @@ class PipestatReader(dict):
 
             attrs = {"Meta": meta}
             relationships = inspect(self[namespace]["table_model"]).relationships
-            print(f"relationships: {relationships.items()}")
+            obj_name = (
+                f"{self[namespace]['table_name'].capitalize()}SQLAlchemyObjectType"
+            )
             if len(relationships.keys()):
-                for relationship in relationships.keys():
-                    print(f"adding relationship: {relationship}")
+                for r in relationships.keys():
                     attrs.update(
-                        {
-                            relationship: f"{PACKAGE_NAME}.{os.path.basename(__file__)}.{self[namespace]['table_name'].capitalize()}SQLAlchemyObjectType"
-                        }
+                        {r: f"{PACKAGE_NAME}.{os.path.basename(__file__)}.{obj_name}"}
                     )
 
             self[namespace]["SQLAlchemyObjectType"] = type(
-                f"{self[namespace]['table_name'].capitalize()}SQLAlchemyObjectType",
+                obj_name,
                 (SQLAlchemyObjectType,),
                 attrs,
             )
