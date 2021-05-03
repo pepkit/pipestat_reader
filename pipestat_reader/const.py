@@ -38,5 +38,5 @@ FILTERS_BY_CLASS = {
         "is_null",
     ],
     Boolean().__class__.__name__: ["is_null", "in", "not_in"],
-    JSONB().__class__.__name__: ["is_null"],
+    JSONB().__class__.__name__: ["is_null", "contains"],
 }
