@@ -13,6 +13,17 @@ from ._version import __version__
 from .const import FILTERS_BY_CLASS, PACKAGE_NAME
 
 
+class CountableConnection(graphene.relay.Connection):
+    class Meta:
+        abstract = True
+
+    total_count = graphene.Int()
+
+    @staticmethod
+    def resolve_total_count(root, info):
+        return root.length
+
+
 class PipestatReader(dict):
     def __init__(self, pipestat_managers: List[pipestat.PipestatManager]):
         super(PipestatReader, self).__init__()
@@ -32,6 +43,7 @@ class PipestatReader(dict):
                 {
                     "model": self[namespace]["table_model"],
                     "interfaces": (relay.Node,),
+                    "connection_class": CountableConnection,
                     "description": f"*{self[namespace]['table_name']}* table model generated with "
                     f"`{PACKAGE_NAME} v{__version__}`",
                 },
@@ -90,8 +102,3 @@ class PipestatReader(dict):
 
     def generate_graphql_schema(self) -> graphene.Schema:
         return graphene.Schema(query=self.query)
-
-
-# def resolver_method(self, info, psm, table_model):
-#     with psm.session as s:
-#         return s.query(table_model).all()
