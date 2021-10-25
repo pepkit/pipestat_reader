@@ -32,7 +32,7 @@ class PipestatReader(dict):
             self.setdefault(namespace, {})
             self[namespace]["pipestat_manager"] = pipestat_manager
             self[namespace]["table_name"] = pipestat_manager.namespace
-            self[namespace]["table_model"] = pipestat_manager._get_orm(
+            self[namespace]["table_model"] = pipestat_manager.get_orm(
                 table_name=self[namespace]["table_name"]
             )
         # the repeated loop is needed so we can get access to all the mappers
