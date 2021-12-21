@@ -1,3 +1,4 @@
+promise
 graphene
 graphene_sqlalchemy
 graphene_sqlalchemy_filter
