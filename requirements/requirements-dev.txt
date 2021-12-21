@@ -1,1 +1,5 @@
-graphql_core=3.1.6
+graphene=2.1.9                
+graphene-sqlalchemy=2.3.0                
+graphene-sqlalchemy-filter=1.12.2               
+graphql-core=2.3.2                
+graphql-relay=2.0.1
