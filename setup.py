@@ -73,7 +73,7 @@ setup(
     ],
     keywords="project, metadata, bioinformatics, sequencing, ngs, workflow",
     url="https://github.com/pepkit/" + PACKAGE,
-    author=u"Michal Stolarczyk",
+    author="Michal Stolarczyk",
     license="BSD2",
     scripts=scripts,
     include_package_data=True,
