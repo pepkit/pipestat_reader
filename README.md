@@ -1,3 +1,11 @@
+# ⛔️ DEPRECATED 
+
+This project is no longer actively maintained or supported.
+
+Functionality from this repository was integrated into Pipestat: https://github.com/pepkit/pipestat
+
+-----
+
 # pipestat_reader - web API generator for pipeline results
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
